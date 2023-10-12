@@ -23,7 +23,7 @@ class Numbers
      * @return string The Arabic idiom that spells inserted number as money
      * @author  2020 Mohamed Elkoumi <mohammedelkoumi@gmail.com>
      */
-    public static function TafqeetMoney($number, $currency = 'sar', $lang = 'ar')
+    public static function TafqeetMoney($number, $currency = 'usd', $lang = 'ar')
     {
         return (new ArabicNumbers())->TafqeetMoney($number, $currency, $lang);
     }
@@ -56,6 +56,4 @@ class Numbers
     {
         return (new ArabicNumbers())->EnglishDigits($value);
     }
-
-
 }

@@ -17,6 +17,10 @@ class LaravelArabicNumbersServiceProvider extends ServiceProvider
     public function boot()
     {
         AliasLoader::getInstance()->alias('Numbers', Numbers::class);
+
+        $this->publishes([
+            __DIR__ . '/config/tafqeet.php' => config_path('tafqeet.php'),
+        ], 'config');
     }
 
     /**

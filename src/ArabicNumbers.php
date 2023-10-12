@@ -78,7 +78,7 @@ class ArabicNumbers
 
         foreach ($xml->xpath($expression) as $num) {
             $str = str_replace(array('أ', 'إ', 'آ'), 'ا', (string)$num);
-            $this->_spell[$str] = (integer)$num['value'];
+            $this->_spell[$str] = (int)$num['value'];
         }
 
         $xml = simplexml_load_file(__DIR__ . '/data/arab_countries.xml');
@@ -260,36 +260,77 @@ class ArabicNumbers
      * @author  2020 Mohamed Elkoumi <mohammedelkoumi@gmail.com>
      * @copyright inspired from The Great 💗 Khaled Al-Sham'aa <khaled@ar-php.org>
      */
-    public function TafqeetMoney($number, $currency = 'sar', $lang = 'ar')
+    // public function TafqeetMoney($number, $currency = 'sar', $lang = 'ar')
+    // {
+    //     //dd($number, $currency, $lang);
+    //     $number = is_string($number) ? $this->EnglishDigits($number) : $number;
+
+    //     $iso = strtoupper($currency);
+    //     $lang = strtolower($lang);
+
+    //     //$number = sprintf("%'.02f", $number);
+    //     //dump(sprintf('%02.2d', 2));
+    //     //dump(sprintf('%01.1d', 2));
+    //     //dump($number);
+
+    //     //$number = sprintf("%01.{$this->_currency[$iso]['decimals']}f", $number);
+    //     $temp = explode('.', $number);
+    //     //dump($number, $temp);
+    //     $string = '';
+
+    //     //dd($temp, sprintf("%'.02f", $temp[1]));
+    //     //$newTemp1 = sprintf("%01.{$this->_currency[$iso]['decimals']}f", $temp[1]);
+    //     //$temp[1] = sprintf('%02.2d', $temp[1]);
+    //     //dd($temp, $newTemp1);
+
+    //     if ($temp[0] != 0) {
+    //         $counted = $this->handelCountedInt($temp[0]);
+    //         $string .= $this->subInt2str($temp[0]);
+    //         $string .= ' ' . $this->_currency[$iso][$lang][$counted];
+    //     }
+    //     if (empty($temp[1]) || $temp[1] == 0) {
+    //         $string .= ' فقط لا غير ';
+    //     }
+
+    //     if (!empty($temp[1]) && $temp[1] != 0) {
+    //         if ($string != '') {
+    //             if ($lang == 'ar') {
+    //                 $string .= ' و ';
+    //             } else {
+    //                 $string .= ' and ';
+    //             }
+    //         }
+    //         $countedf = $this->handelCountedFloat($temp[1]);
+    //         $string .= $this->subInt2str((int)$temp[1]);
+    //         $string .= ' ' . $this->_currency[$iso][$lang][$countedf] . ' فقط لا غير ';
+    //     }
+
+    //     return $string;
+    // }
+
+    public function TafqeetMoney($number, $currency = null, $lang = 'ar')
     {
-        //dd($number, $currency, $lang);
+        $currency = $currency ?: config('tafqeet.default_currency', 'usd');
+
         $number = is_string($number) ? $this->EnglishDigits($number) : $number;
 
         $iso = strtoupper($currency);
         $lang = strtolower($lang);
 
-        //$number = sprintf("%'.02f", $number);
-        //dump(sprintf('%02.2d', 2));
-        //dump(sprintf('%01.1d', 2));
-        //dump($number);
-
-        //$number = sprintf("%01.{$this->_currency[$iso]['decimals']}f", $number);
         $temp = explode('.', $number);
-        //dump($number, $temp);
         $string = '';
-
-        //dd($temp, sprintf("%'.02f", $temp[1]));
-        //$newTemp1 = sprintf("%01.{$this->_currency[$iso]['decimals']}f", $temp[1]);
-        //$temp[1] = sprintf('%02.2d', $temp[1]);
-        //dd($temp, $newTemp1);
 
         if ($temp[0] != 0) {
             $counted = $this->handelCountedInt($temp[0]);
             $string .= $this->subInt2str($temp[0]);
-            $string .= ' ' . $this->_currency[$iso][$lang][$counted];
+            if (config('tafqeet.append_currency_string', true)) {
+                $string .= ' ' . $this->_currency[$iso][$lang][$counted];
+            }
         }
         if (empty($temp[1]) || $temp[1] == 0) {
-            $string .= ' فقط لا غير ';
+            if (config('tafqeet.append_only_phrase', true)) {
+                $string .= ' فقط لا غير ';
+            }
         }
 
         if (!empty($temp[1]) && $temp[1] != 0) {
@@ -302,11 +343,17 @@ class ArabicNumbers
             }
             $countedf = $this->handelCountedFloat($temp[1]);
             $string .= $this->subInt2str((int)$temp[1]);
-            $string .= ' ' . $this->_currency[$iso][$lang][$countedf] . ' فقط لا غير ';
+            if (config('tafqeet.append_currency_string', true)) {
+                $string .= ' ' . $this->_currency[$iso][$lang][$countedf];
+            }
+            if (config('tafqeet.append_only_phrase', true)) {
+                $string .= ' فقط لا غير ';
+            }
         }
 
         return $string;
     }
+
 
     /**
      * Convert Arabic idiom number string into Integer { الحصول على الأرقام العددية من الألفاظ العربية }
@@ -353,7 +400,8 @@ class ArabicNumbers
         $str = str_replace($ptr, " اثنان ", $str);
         $str = trim($str);
 
-        if (strpos($str, 'ناقص') === false
+        if (
+            strpos($str, 'ناقص') === false
             && strpos($str, 'سالب') === false
         ) {
             $negative = false;
