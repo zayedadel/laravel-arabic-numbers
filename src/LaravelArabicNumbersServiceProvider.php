@@ -19,7 +19,7 @@ class LaravelArabicNumbersServiceProvider extends ServiceProvider
         AliasLoader::getInstance()->alias('Numbers', Numbers::class);
 
         $this->publishes([
-            __DIR__ . '/config/tafqeet.php' => config_path('tafqeet.php'),
+            __DIR__ . '/../config/tafqeet.php' => config_path('tafqeet.php'),
         ], 'config');
     }
 
