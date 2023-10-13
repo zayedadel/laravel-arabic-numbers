@@ -328,8 +328,8 @@ class ArabicNumbers
             }
         }
         if (empty($temp[1]) || $temp[1] == 0) {
-            if (config('tafqeet.append_only_phrase', true)) {
-                $string .= ' فقط لا غير ';
+            if (config('tafqeet.append_phrase', true)) {
+                $string .=  config('tafqeet.phrase', ' فقط لا غير ');
             }
         }
 
@@ -346,8 +346,8 @@ class ArabicNumbers
             if (config('tafqeet.append_currency_string', true)) {
                 $string .= ' ' . $this->_currency[$iso][$lang][$countedf];
             }
-            if (config('tafqeet.append_only_phrase', true)) {
-                $string .= ' فقط لا غير ';
+            if (config('tafqeet.append_phrase', true)) {
+                $string .=  config('tafqeet.phrase', ' فقط لا غير ');
             }
         }
 
